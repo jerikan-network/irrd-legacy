@@ -39,6 +39,10 @@ RUN set -e; for db in as-set aut-num route-set route route6; do \
 
 RUN cd /databases; for h in *.db; do echo irr_database ${h%.db} >> irrd.conf; done
 
+FROM busybox AS busybox
+
 FROM scratch
 COPY --from=fetcher /databases/ /databases/
+COPY --from=busybox /bin/sleep /sleep
 VOLUME /databases
+CMD ["/sleep", "1000d"]
