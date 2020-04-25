@@ -11,8 +11,9 @@ RUN apt-get -qqy update \
         libglib2.0-dev \
         make \
     && rm -rf /var/cache/apt
-COPY . /app/
+COPY src/ /app/src/
 RUN cd /app/src \
+    && sed -i "s/git describe/echo 0.0 ||/" configure.ac \
     && mkdir m4 && autoreconf -fi \
     && ./configure --prefix=/app/irrd \
     && make \
