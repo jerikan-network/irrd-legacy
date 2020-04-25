@@ -37,7 +37,10 @@ RUN set -e; for db in as-set aut-num route-set route route6; do \
         curl -fsS https://ftp.ripe.net/ripe/dbase/split/ripe.db.$db.gz | gunzip -c >> /databases/ripe.db; \
     done
 
-RUN cd /databases; for h in *.db; do echo irr_database ${h%.db} >> irrd.conf; done
+RUN cd /databases; for h in *.db; do \
+        echo "irr_database ${h%.db}" >> irrd.conf; \
+        echo "irr_database ${h%.db} filter routing-registry-objects" >> irrd.conf; \
+    done
 
 FROM busybox AS busybox
 
