@@ -68,4 +68,5 @@ COPY --from=builder /app/irrd/ /app/irrd/
 COPY --from=fetcher /databases /app/databases/
 EXPOSE 5674
 EXPOSE 43
+STOPSIGNAL SIGINT
 ENTRYPOINT ["/app/irrd/sbin/irrd", "-n", "-g", "irrd", "-l", "irrd", "-d", "/app/databases", "-f", "/app/databases/irrd.conf"]
