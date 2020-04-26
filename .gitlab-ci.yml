@@ -9,5 +9,5 @@ irrd image with database:
   rules:
     - if: $CI_COMMIT_BRANCH == "blade/master"
   script:
-    - docker build --build-arg=$(date +%F) -t ${CI_REGISTRY_IMAGE}:latest .
+    - docker build --build-arg=TODAY=$(date +%F) -t ${CI_REGISTRY_IMAGE}:latest .
     - docker push ${CI_REGISTRY_IMAGE}:latest
