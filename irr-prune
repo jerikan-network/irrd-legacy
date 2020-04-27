@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+
+# Quick and dirty script to minimize an IRR database to use only by
+# bgpq3/bgpq4. The core idea is we have to only keep what is needed
+# for "!i" (expand an AS-SET), "!gas" and "!6as" (get routes from
+# specified AS) to work.
+
+import sys
+import re
+
+
+START = 1
+SKIPOBJECT = 2         # skip current object
+KEEPATTRIBUTE = 3      # also, keep current object
+SKIPATTRIBUTE = 4      # also, keep current object
+
+names = re.compile(rb"^(?:as-set|aut-num|route|route6|route-set):")
+attributes = re.compile(rb"^(?:origin|mnt-by|mbrs-by-ref|member-of|members|"
+                        rb"mp-members|roa-status|source):")
+comments = set(b"#%")
+continuation = set(b" \t+")
+state = START
+for line in sys.stdin.buffer:
+    if line == b"" or line == b"\n" or line == b"\r\n":
+        # Empty line, end of the current object
+        if state not in {SKIPOBJECT, START}:
+            sys.stdout.buffer.write(line)
+        state = START
+        continue
+    if line[0] in comments:
+        # Skip comments
+        continue
+    if state == START:
+        # Outside of an object
+        if names.match(line):
+            sys.stdout.buffer.write(line)
+            state = KEEPATTRIBUTE
+            continue
+        state = SKIPOBJECT
+        continue
+    if state == SKIPOBJECT:
+        # Skip current object until the end
+        continue
+    if state in {SKIPATTRIBUTE, KEEPATTRIBUTE}:
+        if line[0] in continuation:
+            # Continuation
+            if state == KEEPATTRIBUTE:
+                sys.stdout.buffer.write(line)
+            continue
+        if attributes.match(line):
+            sys.stdout.buffer.write(line)
+            state = KEEPATTRIBUTE
+            continue
+        state = SKIPATTRIBUTE
+        continue
+    raise RuntimeError("Illegal state")

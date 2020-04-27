@@ -25,8 +25,10 @@ RUN apt-get -qqy update \
         ca-certificates \
         curl \
         gzip \
+        python3 \
     && rm -rf /var/cache/apt
 WORKDIR /databases
+COPY irr-prune /usr/bin/irr-prune
 
 # Cache busting. Use `--build-arg TODAY=$(date +%F)` to bust cache daily.
 ARG TODAY=2020-01-01
@@ -45,19 +47,29 @@ ARG TODAY=2020-01-01
 # - RADB
 # - RIPE
 
-RUN curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | grep -v '^person: *Name Removed' > /databases/afrinic.db
-RUN set -e; for db in as-set aut-num route-set route route6; do \
-        curl -fsS https://ftp.apnic.net/apnic/whois/apnic.db.$db.gz | gunzip -c >> /databases/apnic.db; \
-    done
-RUN curl -fsS https://ftp.arin.net/pub/rr/arin.db -o /databases/arin.db
-RUN curl -fsS ftp://ftp.radb.net/radb/dbase/radb.db.gz | gunzip -c > /databases/radb.db
-RUN set -e; for db in as-set aut-num route-set route route6; do \
-        curl -fsS https://ftp.ripe.net/ripe/dbase/split/ripe.db.$db.gz | gunzip -c >> /databases/ripe.db; \
-    done
+# AFRINIC
+RUN curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | irr-prune > /databases/afrinic.db
 
-RUN cd /databases; for h in *.db; do \
+# APNIC
+RUN set -e; (for db in as-set aut-num route-set route route6; do \
+        curl -fsS https://ftp.apnic.net/apnic/whois/apnic.db.$db.gz | gunzip -c; \
+        echo; \
+    done) | irr-prune > /databases/apnic.db
+
+# ARIN
+RUN curl -fsS https://ftp.arin.net/pub/rr/arin.db | irr-prune > /databases/arin.db
+
+# RADB
+RUN curl -fsS ftp://ftp.radb.net/radb/dbase/radb.db.gz | gunzip -c | irr-prune > /databases/radb.db
+
+# RIPE
+RUN set -e; (for db in as-set aut-num route-set route route6; do \
+        curl -fsS https://ftp.ripe.net/ripe/dbase/split/ripe.db.$db.gz | gunzip -c; \
+        echo; \
+    done) | irr-prune > /databases/ripe.db
+
+RUN cd /databases; for h in $(ls -rt *.db); do \
         echo "irr_database ${h%.db}" >> irrd.conf; \
-        echo "irr_database ${h%.db} filter routing-registry-objects" >> irrd.conf; \
     done
 
 FROM debian:10
