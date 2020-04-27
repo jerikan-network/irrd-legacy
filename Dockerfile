@@ -29,44 +29,59 @@ RUN apt-get -qqy update \
     && rm -rf /var/cache/apt
 WORKDIR /databases
 COPY irr-prune /usr/bin/irr-prune
+RUN ln -sf /bin/bash /bin/sh
 
 # Cache busting. Use `--build-arg TODAY=$(date +%F)` to bust cache daily.
 ARG TODAY=2020-01-01
 
-# Sources: <http://www.irr.net/docs/list.html>
-#
-# Tools like bgpq3 are using RADB server by default. So, as per the
-# URL, we should mirror AFRINIC, ALTDB, AOLTW, APNIC, ARIN, BELL,
-# BBOI, CANARIE, EASYNET, EPOCH, HOST, JPIRR, LEVEL3, NESTEGG, NTTCOM,
-# OPENFACE, OTTIX, PANIX, REACH, RGNET, RIPE, RISQ, ROGERS, TC.
-#
-# This is a lot, we limit ourselves to a few DB:
-# - AFRINIC
-# - APNIC
-# - ARIN
-# - RADB
-# - RIPE
+# We use this list: <https://www.gin.ntt.net/support-center/policies-procedures/routing-registry/>
 
-# AFRINIC
-RUN curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | irr-prune > /databases/afrinic.db
-
-# APNIC
-RUN set -e; (for db in as-set aut-num route-set route route6; do \
-        curl -fsS https://ftp.apnic.net/apnic/whois/apnic.db.$db.gz | gunzip -c; \
-        echo; \
-    done) | irr-prune > /databases/apnic.db
-
-# ARIN
-RUN curl -fsS https://ftp.arin.net/pub/rr/arin.db | irr-prune > /databases/arin.db
-
+# NTTCOM
+RUN set -o pipefail && curl -fsS ftp://rr1.ntt.net/nttcomRR/nttcom.db.gz | gunzip -c | irr-prune > /databases/nttcom.db
 # RADB
-RUN curl -fsS ftp://ftp.radb.net/radb/dbase/radb.db.gz | gunzip -c | irr-prune > /databases/radb.db
-
+RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/radb.db.gz | gunzip -c | irr-prune > /databases/radb.db
 # RIPE
-RUN set -e; (for db in as-set aut-num route-set route route6; do \
+RUN set -eo pipefail && (for db in as-set aut-num route-set route route6; do \
         curl -fsS https://ftp.ripe.net/ripe/dbase/split/ripe.db.$db.gz | gunzip -c; \
         echo; \
     done) | irr-prune > /databases/ripe.db
+# RIPE-NONAUTH
+RUN set -o pipefail && curl -fsS https://ftp.ripe.net/ripe/dbase/ripe-nonauth.db.gz | gunzip -c | irr-prune > /databases/ripe-nonauth.db
+# ALTDB
+RUN set -o pipefail && curl -fsS ftp://ftp.altdb.net/pub/altdb/altdb.db.gz | gunzip -c | irr-prune > /databases/altdb.db
+# BELL
+RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/bell.db.gz | gunzip -c | irr-prune > /databases/bell.db
+# LEVEL3
+RUN set -o pipefail && curl -fsS ftp://rr.Level3.net/pub/rr/level3.db.gz | gunzip -c | irr-prune > /databases/level3.db
+# RGNET
+RUN set -o pipefail && curl -fsS ftp://rg.net/rgnet/RGNET.db.gz | gunzip -c | irr-prune > /databases/rgnet.db
+# APNIC
+RUN set -eo pipefail && (for db in as-set aut-num route-set route route6; do \
+        curl -fsS https://ftp.apnic.net/apnic/whois/apnic.db.$db.gz | gunzip -c; \
+        echo; \
+    done) | irr-prune > /databases/apnic.db
+# JPIRR
+RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/jpirr.db.gz | gunzip -c | irr-prune > /databases/jpirr.db
+# ARIN
+RUN set -o pipefail && curl -fsS https://ftp.arin.net/pub/rr/arin.db | irr-prune > /databases/arin.db
+# BBOI
+RUN set -o pipefail && curl -fsS ftp://irr.bboi.net/bboi.db.gz | irr-prune > /databases/bboi.db
+# TC
+RUN set -o pipefail && curl -fsS ftp://ftp.bgp.net.br/dbase/tc.db.gz | irr-prune > /databases/tc.db
+# AFRINIC
+RUN set -o pipefail && curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | irr-prune > /databases/afrinic.db
+# ARIN-WHOIS
+# ???
+# RPKI
+# ???
+# REGISTROBR
+# ???
+
+
+# APNIC
+
+
+
 
 RUN cd /databases; for h in $(ls -rt *.db); do \
         echo "irr_database ${h%.db}" >> irrd.conf; \
