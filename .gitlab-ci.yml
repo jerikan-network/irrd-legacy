@@ -3,6 +3,7 @@ before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 stages:
   - build
+  - deploy
 irrd image with database:
   stage: build
   tags: [network]
@@ -11,3 +12,11 @@ irrd image with database:
   script:
     - docker build --build-arg=TODAY=$(date +%F) -t ${CI_REGISTRY_IMAGE}:latest .
     - docker push ${CI_REGISTRY_IMAGE}:latest
+
+rebuild cmdb:
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  trigger:
+    project: blade-group/infra/network/cmdb
+    branch: master
