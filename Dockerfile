@@ -65,7 +65,7 @@ RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/jpirr.db.gz | gun
 # ARIN
 RUN set -o pipefail && curl -fsS https://ftp.arin.net/pub/rr/arin.db | irr-prune > /databases/arin.db
 # BBOI
-RUN set -o pipefail && curl -fsS ftp://irr.bboi.net/bboi.db.gz | irr-prune > /databases/bboi.db
+RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/bboi.db.gz | irr-prune > /databases/bboi.db
 # TC
 RUN set -o pipefail && curl -fsS ftp://ftp.bgp.net.br/dbase/tc.db.gz | irr-prune > /databases/tc.db
 # AFRINIC
