@@ -79,12 +79,6 @@ RUN set -o pipefail && curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz
 # REGISTROBR
 # ???
 
-
-# APNIC
-
-
-
-
 RUN cd /databases; for h in $(ls -rt *.db); do \
         echo "irr_database ${h%.db}" >> irrd.conf; \
     done
