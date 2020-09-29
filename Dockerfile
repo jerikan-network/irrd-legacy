@@ -88,7 +88,14 @@ RUN set -o pipefail && curl -fsS http://irrexplorer.nlnog.net/static/dumps/arin-
 # RPKI
 # ???
 # REGISTROBR
-# ???
+RUN set -o pipefail && curl -fsS https://ftp.registro.br/pub/numeracao/origin/nicbr-asn-blk-latest.txt | \
+        awk -F'|' '{ asn=$1; for (i=4; i <= NF; i++) { if (index($i, ":") == 0) { \
+        printf("route:    %s\n", $i) } else { \
+        printf("route6:   %s\n", $i) }; \
+        print  "origin:   "$1; \
+        print  "mnt-by:   MAINT-FAKE"; \
+        print  "source:   REGISTROBR"; \
+        print  "" }}' > /databases/registrobr.db
 
 RUN cd /databases; for h in $(ls -rt *.db); do \
         echo "irr_database ${h%.db}" >> irrd.conf; \
