@@ -25,7 +25,9 @@ RUN apt-get -qqy update \
         ca-certificates \
         curl \
         gzip \
+        bzip2 \
         python3 \
+        jq \
     && rm -rf /var/cache/apt
 WORKDIR /databases
 COPY irr-prune /usr/bin/irr-prune
@@ -73,7 +75,16 @@ RUN set -o pipefail && curl -fsS ftp://ftp.bgp.net.br/dbase/tc.db.gz | irr-prune
 # AFRINIC
 RUN set -o pipefail && curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | irr-prune > /databases/afrinic.db
 # ARIN-WHOIS
-# ???
+RUN set -o pipefail && curl -fsS http://irrexplorer.nlnog.net/static/dumps/arin-whois-originas.json.bz2 | bunzip2 -c | \
+        jq -r '.whois_records|to_entries[]|(.key as $version|.value[]|[ \
+            (if $version=="v4" then \
+            "route:    " else \
+            "route6:   " end)+.prefix, \
+            "origin:   "+.originas, \
+            "mnt-by:   MAINT-FAKE", \
+            "source:   ARIN-WHOIS", \
+            "" \
+        ]|join("\n"))' > /databases/arin-whois.db
 # RPKI
 # ???
 # REGISTROBR
