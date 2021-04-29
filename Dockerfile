@@ -71,7 +71,7 @@ RUN set -o pipefail && curl -fsS https://ftp.arin.net/pub/rr/arin-nonauth.db.gz 
 # BBOI
 RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/bboi.db.gz | irr-prune > /databases/bboi.db
 # TC
-RUN set -o pipefail && curl -fsS ftp://ftp.bgp.net.br/dbase/tc.db.gz | irr-prune > /databases/tc.db
+RUN set -o pipefail && curl -fsS ftp://ftp.bgp.net.br/tc.db.gz | irr-prune > /databases/tc.db
 # AFRINIC
 RUN set -o pipefail && curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | irr-prune > /databases/afrinic.db
 # ARIN-WHOIS
