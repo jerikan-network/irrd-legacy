@@ -25,4 +25,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/vincentbernat/irrd-legacy:latest
+            ghcr.io/jerikan-network/irrd-legacy:latest
