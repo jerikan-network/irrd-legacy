@@ -75,7 +75,7 @@ RUN set -o pipefail && curl -fsS ftp://ftp.bgp.net.br/tc.db.gz | irr-prune > /da
 # AFRINIC
 RUN set -o pipefail && curl -fsS https://ftp.afrinic.net/pub/dbase/afrinic.db.gz | gunzip -c | irr-prune > /databases/afrinic.db
 # ARIN-WHOIS
-RUN set -o pipefail && curl -fsS http://irrexplorer.nlnog.net/static/dumps/arin-whois-originas.json.bz2 | bunzip2 -c | \
+RUN set -o pipefail && curl -fsS https://irrexplorer.nlnog.net/static/dumps/arin-whois-originas.json.bz2 | bunzip2 -c | \
         jq -r '.whois_records|to_entries[]|(.key as $version|.value[]|[ \
             (if $version=="v4" then \
             "route:    " else \
