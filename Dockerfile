@@ -64,8 +64,6 @@ RUN set -eo pipefail && (for db in as-set aut-num route-set route route6; do \
 RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/jpirr.db.gz | gunzip -c | irr-prune > /databases/jpirr.db
 # ARIN
 RUN set -o pipefail && curl -fsS https://ftp.arin.net/pub/rr/arin.db.gz | gunzip -c | irr-prune > /databases/arin.db
-# ARIN-NONAUTH
-RUN set -o pipefail && curl -fsS https://ftp.arin.net/pub/rr/arin-nonauth.db.gz | gunzip -c | irr-prune > /databases/arin-nonauth.db
 # BBOI
 RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/bboi.db.gz | irr-prune > /databases/bboi.db
 # TC
