@@ -55,8 +55,6 @@ RUN set -o pipefail && curl -fsS ftp://ftp.altdb.net/pub/altdb/altdb.db.gz | gun
 RUN set -o pipefail && curl -fsS ftp://ftp.radb.net/radb/dbase/bell.db.gz | gunzip -c | irr-prune > /databases/bell.db
 # LEVEL3
 RUN set -o pipefail && curl -fsS ftp://rr.Level3.net/pub/rr/level3.db.gz | gunzip -c | irr-prune > /databases/level3.db
-# RGNET
-RUN set -o pipefail && curl -fsS ftp://rg.net/rgnet/RGNET.db.gz | gunzip -c | irr-prune > /databases/rgnet.db
 # APNIC
 RUN set -eo pipefail && (for db in as-set aut-num route-set route route6; do \
         curl -fsS https://ftp.apnic.net/apnic/whois/apnic.db.$db.gz | gunzip -c; \
