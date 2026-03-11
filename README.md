@@ -1,5 +1,8 @@
-About this legacy repository
-============================
+# About this legacy repository
+
+> [!WARNING]
+> This repository does not build anymore as some sources are now unavailable.
+> This should be fixable with some motivation.
 
 This is the source distribution of the legacy Internet Routing Registry Daemon
 (IRRd). **Users of IRRd are strongly recommended to migrate to [IRRd version 4](https://github.com/irrdnet/irrd)!**
@@ -23,15 +26,13 @@ make
 make install
 ```
 
-Ubuntu 12 notes
-===============
+## Ubuntu 12 notes
 
 ```
 sudo apt-get install byacc automake autoconf build-essential gnupg flex
 ```
 
-Ubuntu 14 notes
-===============
+## Ubuntu 14 notes
 
 ```
 sudo apt-get install byacc automake autoconf build-essential gnupg flex libglib2.0-dev
