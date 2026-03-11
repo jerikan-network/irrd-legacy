@@ -1,4 +1,4 @@
-FROM debian:10 AS builder
+FROM debian:13 AS builder
 RUN apt-get -qqy update \
     && apt-get install -qqy --no-install-recommends \
         autoconf \
@@ -19,7 +19,7 @@ RUN cd /app/src \
     && make \
     && make install
 
-FROM debian:10 AS fetcher
+FROM debian:13 AS fetcher
 RUN apt-get -qqy update \
     && apt-get install -qqy --no-install-recommends \
         ca-certificates \
@@ -97,7 +97,7 @@ RUN cd /databases; for h in $(ls -rt *.db); do \
         echo "irr_database ${h%.db}" >> irrd.conf; \
     done
 
-FROM debian:10
+FROM debian:13
 RUN apt-get -qqy update \
     && apt-get install -qqy --no-install-recommends \
         libglib2.0-0
